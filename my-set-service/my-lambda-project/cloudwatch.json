@@ -1,0 +1,74 @@
+{
+    "widgets": [
+        {
+            "type": "metric",
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 6,
+            "properties": {
+                "view": "timeSeries",
+                "stacked": false,
+                "metrics": [
+                    [
+                        {
+                            "expression": "PERCENTILE([m1], 90)",
+                            "label": "P90 Duration",
+                            "id": "e1"
+                        }
+                    ],
+                    [
+                        "AWS/Lambda",
+                        "Duration",
+                        "FunctionName",
+                        "mylambdastack-LambdaFunction-V79cQI3FIzzY",
+                        {
+                            "stat": "p90",
+                            "label": "Duration p90",
+                            "id": "m1"
+                        }
+                    ],
+                    [
+                        "AWS/Lambda",
+                        "Invocations",
+                        "FunctionName",
+                        "mylambdastack-LambdaFunction-V79cQI3FIzzY",
+                        {
+                            "stat": "Sum",
+                            "period": 60,
+                            "label": "Invocations per Minute",
+                            "id": "m2"
+                        }
+                    ],
+                    [
+                        {
+                            "expression": "m2 / 60",
+                            "label": "TPS",
+                            "id": "e2"
+                        }
+                    ]
+                ],
+                "yAxis": {
+                    "left": {
+                        "min": 0,
+                        "max": 500
+                    },
+                    "right": {
+                        "min": 0,
+                        "max": 1
+                    }
+                },
+                "annotations": {
+                    "horizontal": [
+                        {
+                            "color": "#ff0000",
+                            "label": "Threshold 500ms",
+                            "value": 500
+                        }
+                    ]
+                },
+                "title": "Lambda P90 Duration and TPS"
+            }
+        }
+    ]
+}

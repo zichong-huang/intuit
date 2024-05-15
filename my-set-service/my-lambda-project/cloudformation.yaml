@@ -15,6 +15,7 @@ Resources:
   #     Tags:
   #       - Key: Name
   #         Value: "my-lambda-function"
+  
   LambdaExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
