@@ -30,8 +30,6 @@ jobs:
     - name: Log in to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-      with:
-        region: us-east-1
 
     - name: Build Docker image
       run: |
@@ -41,7 +39,7 @@ jobs:
       run: |
         IMAGE_TAG=latest
         ECR_REPOSITORY=732385684161.dkr.ecr.us-east-1.amazonaws.com/my-lambda-function
-        docker tag my-lambda-function:latest $ECR_REPOSITORY:$IMAGE_TAG
+        docker tag my-lambda-function:latest ${{ECR_REPOSITORY}}:$IMAGE_TAG
 
     - name: Push Docker image to ECR
       run: |
