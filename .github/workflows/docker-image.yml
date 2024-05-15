@@ -38,21 +38,19 @@ jobs:
     - name: Tag Docker image
       run: |
         IMAGE_TAG=latest
-        ECR_REPOSITORY=732385684161.dkr.ecr.us-east-1.amazonaws.com/my-lambda-function
-        docker tag my-lambda-function:latest ${{ECR_REPOSITORY}}:$IMAGE_TAG
+        docker tag my-lambda-function:latest ${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
 
     - name: Push Docker image to ECR
       run: |
         IMAGE_TAG=latest
         ECR_REPOSITORY=732385684161.dkr.ecr.us-east-1.amazonaws.com/my-lambda-function
-        docker push $ECR_REPOSITORY:$IMAGE_TAG
+        docker push ${{ env.ECR_REPOSITORY }}:$IMAGE_TAG
 
     - name: Update Lambda function
       run: |
         REGION=us-east-1
         IMAGE_TAG=latest
-        ECR_REPOSITORY=732385684161.dkr.ecr.us-east-1.amazonaws.com/my-lambda-function
-        aws lambda update-function-code --function-name mylambdastack-LambdaFunction-V79cQI3FIzzY --image-uri $ECR_REPOSITORY:$IMAGE_TAG --region $REGION
+        aws lambda update-function-code --function-name mylambdastack-LambdaFunction-V79cQI3FIzzY --image-uri ${{ env.ECR_REPOSITORY }}:$IMAGE_TAG --region $REGION
 
   test:
     runs-on: ubuntu-latest
