@@ -92,6 +92,6 @@ jobs:
         pip install -r requirements.txt
 
     - name: Run unit tests
-      working-directory: ./my-set-service/my-lambda-project
+      working-directory: ./my-set-service/my-lambda-project/tests
       run: |
-        pytest
+        python test_api.py
