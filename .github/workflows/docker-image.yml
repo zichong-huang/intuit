@@ -6,7 +6,7 @@ on:
       - main
 
 env:
-  REGION: us-east-1
+  REGION: ${{ secrets.AWS_REGION }}
   IMAGE_TAG: latest
 
 jobs:
@@ -31,35 +31,35 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-
 
-    - name: Log in to Amazon ECR
+    - name: Configure AWS credentials
       env:
-        AWS_REGION: ${{ env.REGION }}
-        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
       run: |
-        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY
+        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+        aws configure set region $AWS_REGION
 
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REPOSITORY }}
+    
     - name: Build Docker image
       run: |
         docker buildx build --platform linux/arm64 -t my-lambda-function .
 
     - name: Tag Docker image
-      env:
-        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
       run: |
-        docker tag my-lambda-function:latest $ECR_REPOSITORY:${{ env.IMAGE_TAG }}
+        docker tag my-lambda-function:latest ${{ secrets.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
     - name: Push Docker image to ECR
-      env:
-        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
       run: |
-        docker push $ECR_REPOSITORY:${{ env.IMAGE_TAG }}
+        docker push ${{ secrets.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }}
 
     - name: Update Lambda function
-      env:
-        AWS_REGION: ${{ env.REGION }}
-        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
       run: |
-        aws lambda update-function-code --function-name mylambdastack-LambdaFunction-V79cQI3FIzzY --image-uri $ECR_REPOSITORY:${{ env.IMAGE_TAG }} --region $AWS_REGION
+        aws lambda update-function-code --function-name mylambdastack-LambdaFunction-V79cQI3FIzzY --image-uri ${{ secrets.ECR_REPOSITORY }}:${{ env.IMAGE_TAG }} --region ${{ secrets.AWS_REGION }}
 
   test:
     runs-on: ubuntu-latest
