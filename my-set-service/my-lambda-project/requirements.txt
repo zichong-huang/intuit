@@ -1,3 +1,4 @@
 # Example packages
 requests==2.25.1
 boto3==1.17.44
+pytest==6.2.4
