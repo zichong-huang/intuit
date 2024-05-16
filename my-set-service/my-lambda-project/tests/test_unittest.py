@@ -14,7 +14,7 @@ def make_request(method, operation, item=None):
     event = {
         "httpMethod": method,
         "body": json.dumps({"operation": operation, "item": item}) if method == "POST" else None,
-        "queryStringParameters": {"operation": operation, "item": str(item)} if method in ["GET", "DELETE"] else None,
+        "queryStringParameters": {"item": str(item)} if method in ["GET", "DELETE"] else None,
         "headers": headers
     }
     context = {}

@@ -3,7 +3,7 @@ import requests
 import json
 
 # Base URL of the API Gateway
-BASE_URL = "https://lyz9wufcbk.execute-api.us-east-1.amazonaws.com/prod/"
+BASE_URL = "https://7okw1aj4k2.execute-api.us-east-1.amazonaws.com/prod/"
 
 # Headers
 headers = {
@@ -20,20 +20,36 @@ def add_item(item):
     return response
 
 def remove_item(item):
-    url = f"{BASE_URL}removeItem?operation=RemoveItem&item={item}"
-    response = requests.delete(url, headers=headers)
+    url = f"{BASE_URL}removeItem"
+    params = {
+        "item": item
+    }
+    response = requests.delete(url, headers=headers, params=params)
     return response
 
 def has_item(item):
     url = f"{BASE_URL}hasItem"
     params = {
-        "operation": "HasItem",
         "item": item
     }
     response = requests.get(url, headers=headers, params=params)
     return response
 
+def reset_set():
+    url = f"{BASE_URL}resetSet"
+    payload = {
+        "operation": "Reset"
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    return response
+
 class TestAPIGateway(unittest.TestCase):
+
+    def setUp(self):
+        """Reset the remote set_items before each test."""
+        response = reset_set()
+        self.assertEqual(response.status_code, 200)
+
     def test_add_item(self):
         """Test adding an item to the set."""
         item = 10
