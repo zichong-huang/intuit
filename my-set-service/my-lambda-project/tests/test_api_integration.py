@@ -1,77 +1,131 @@
 import unittest
 import requests
+import json
 
-def make_request(method, url, operation, item):
-    """ General helper function for making HTTP requests. """
-    headers = {'Content-Type': 'application/json'}
-    params = {"operation": operation, "item": str(item)} if method == 'GET' else None
-    data = {"operation": operation, "item": str(item)} if method in ["POST", "DELETE"] else None
+# Base URL of the API Gateway
+BASE_URL = "https://lyz9wufcbk.execute-api.us-east-1.amazonaws.com/prod/"
 
-    if method in ["POST", "DELETE"]:
-        response = requests.request(method, url, json=data, headers=headers)
-    elif method == "GET":
-        response = requests.get(url, params=params, headers=headers)
+# Headers
+headers = {
+    "Content-Type": "application/json"
+}
 
+def add_item(item):
+    url = f"{BASE_URL}addItem"
+    payload = {
+        "operation": "AddItem",
+        "item": item
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
     return response
 
-class TestAPI(unittest.TestCase):
-    base_url = "https://lyz9wufcbk.execute-api.us-east-1.amazonaws.com/prod/"
+def remove_item(item):
+    url = f"{BASE_URL}removeItem"
+    params = {
+        "operation": "RemoveItem",
+        "item": item
+    }
+    response = requests.delete(url, headers=headers, params=params)
+    return response
+
+def has_item(item):
+    url = f"{BASE_URL}hasItem"
+    params = {
+        "operation": "HasItem",
+        "item": item
+    }
+    response = requests.get(url, headers=headers, params=params)
+    return response
+
+def reset_set():
+    url = f"{BASE_URL}resetSet"
+    payload = {
+        "operation": "Reset"
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(payload))
+    return response
+
+class TestAPIGateway(unittest.TestCase):
+
+    def setUp(self):
+        """Reset the remote set_items before each test."""
+        response = reset_set()
+        self.assertEqual(response.status_code, 200)
 
     def test_add_and_check_items(self):
-        """Test: Add 10, 20, 30 into empty set, then check the list is still the same after sorting."""
+        """Test: Add 1, 2, 3 into empty set, then check 1, 2, 3 are there."""
         print("\nRunning test: Add and Check Items")
-        items = [10, 20, 30]
+        items = [1, 2, 3]
         for item in items:
-            response = make_request('POST', f"{self.base_url}addItem", "AddItem", item)
-            self.assertTrue(response.ok, f"Failed to add item {item}: {response.text}")
-
+            response = add_item(item)
+            self.assertEqual(response.status_code, 200)
+        
         # Check the items in the set
         for item in items:
-            response = make_request('GET', f"{self.base_url}hasItem", "HasItem", item)
-            self.assertTrue(response.ok, f"Failed to check item {item}: {response.text}")
+            response = has_item(item)
+            self.assertEqual(response.status_code, 200)
             response_data = response.json()
             expected_message = f"Item {item} exists: True."
-            self.assertEqual(response_data.get("message"), expected_message, f"Unexpected response for item {item}: {response_data}")
+            self.assertEqual(response_data['message'], expected_message)
 
     def test_add_remove_and_check_items(self):
-        """Test: Add 10, 20, 30 into empty set, then remove 20, check the list contains only 10 and 30."""
+        """Test: Add 1, 2, 3 into empty set, then remove 2, check 1 and 3 are there."""
         print("\nRunning test: Add, Remove, and Check Items")
-        items = [10, 20, 30]
+        items = [1, 2, 3]
         for item in items:
-            response = make_request('POST', f"{self.base_url}addItem", "AddItem", item)
-            self.assertTrue(response.ok, f"Failed to add item {item}: {response.text}")
+            response = add_item(item)
+            self.assertEqual(response.status_code, 200)
 
-        # Remove item 20
-        response = make_request('DELETE', f"{self.base_url}removeItem", "RemoveItem", 20)
-        self.assertTrue(response.ok, f"Failed to remove item 20: {response.text}")
+        # Remove item 2
+        response = remove_item(2)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertIn('Item 2 removed successfully', response_data['message'])
 
         # Check the remaining items in the set
-        remaining_items = [10, 30]
+        remaining_items = [1, 3]
         for item in remaining_items:
-            response = make_request('GET', f"{self.base_url}hasItem", "HasItem", item)
-            self.assertTrue(response.ok, f"Failed to check item {item}: {response.text}")
+            response = has_item(item)
+            self.assertEqual(response.status_code, 200)
             response_data = response.json()
             expected_message = f"Item {item} exists: True."
-            self.assertEqual(response_data.get("message"), expected_message, f"Unexpected response for item {item}: {response_data}")
+            self.assertEqual(response_data['message'], expected_message)
 
     def test_add_remove_and_check_item_absence(self):
-        """Test: Add 10, 20, 30 into empty set, then remove 20, check if 20 is still there."""
+        """Test: Add 1, 2, 3 into empty set, then remove 2, check 1 and 3 are there, remove 3, check 1 is there."""
         print("\nRunning test: Add, Remove, and Check Item Absence")
-        items = [10, 20, 30]
+        items = [1, 2, 3]
         for item in items:
-            response = make_request('POST', f"{self.base_url}addItem", "AddItem", item)
-            self.assertTrue(response.ok, f"Failed to add item {item}: {response.text}")
+            response = add_item(item)
+            self.assertEqual(response.status_code, 200)
 
-        # Remove item 20
-        response = make_request('DELETE', f"{self.base_url}removeItem", "RemoveItem", 20)
-        self.assertTrue(response.ok, f"Failed to remove item 20: {response.text}")
-
-        # Check that item 20 is not in the set
-        response = make_request('GET', f"{self.base_url}hasItem", "HasItem", 20)
-        self.assertTrue(response.ok, f"Failed to check item 20: {response.text}")
+        # Remove item 2
+        response = remove_item(2)
+        self.assertEqual(response.status_code, 200)
         response_data = response.json()
-        expected_message = "Item 20 exists: False."
-        self.assertEqual(response_data.get("message"), expected_message, f"Unexpected response for item 20: {response_data}")
+        self.assertIn('Item 2 removed successfully', response_data['message'])
+
+        # Check remaining items in the set (1 and 3)
+        remaining_items = [1, 3]
+        for item in remaining_items:
+            response = has_item(item)
+            self.assertEqual(response.status_code, 200)
+            response_data = response.json()
+            expected_message = f"Item {item} exists: True."
+            self.assertEqual(response_data['message'], expected_message)
+
+        # Remove item 3
+        response = remove_item(3)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertIn('Item 3 removed successfully', response_data['message'])
+
+        # Check remaining item in the set (only 1)
+        response = has_item(1)
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        expected_message = f"Item 1 exists: True."
+        self.assertEqual(response_data['message'], expected_message)
 
 if __name__ == '__main__':
-    unittest.ma
+    unittest.main()

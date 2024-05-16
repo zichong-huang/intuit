@@ -4,6 +4,8 @@ import json
 set_items = []
 
 def lambda_handler(event, context):
+    global set_items
+
     # Extract operation and item from query parameters for GET requests
     if event.get('httpMethod') == 'GET' or event.get('httpMethod') == 'DELETE':
         operation = event.get('queryStringParameters', {}).get('operation')
@@ -45,8 +47,12 @@ def lambda_handler(event, context):
         exists = item in set_items
         return format_response(200, f'Item {item} exists: {exists}.')
 
+    elif operation == 'Reset':
+        set_items = []
+        return format_response(200, 'Set items have been reset.')
+
     else:
-        return format_response(400, 'Invalid operation specified. Available operations are AddItem, RemoveItem, and HasItem.')
+        return format_response(400, 'Invalid operation specified. Available operations are AddItem, RemoveItem, HasItem, and Reset.')
 
 def format_response(status_code, message):
     """
