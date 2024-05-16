@@ -31,7 +31,7 @@ jobs:
     - name: Run unit tests
       working-directory: ./my-set-service/my-lambda-project/tests
       run: |
-        python test_local_unit.py
+        python test_unittest.py
 
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -111,4 +111,4 @@ jobs:
     - name: Run integration tests
       working-directory: ./my-set-service/my-lambda-project/tests
       run: |
-        python test_api.py
+        python test_api_integration.py
