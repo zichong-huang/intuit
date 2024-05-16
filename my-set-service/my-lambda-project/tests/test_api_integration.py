@@ -3,7 +3,7 @@ import requests
 import json
 
 # Base URL of the API Gateway
-BASE_URL = "https://lyz9wufcbk.execute-api.us-east-1.amazonaws.com/prod/"
+BASE_URL = "https://7okw1aj4k2.execute-api.us-east-1.amazonaws.com/prod/"
 
 # Headers
 headers = {
