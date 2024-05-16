@@ -29,26 +29,26 @@ def lambda_handler(event, context):
             return format_response(400, 'The item must be an integer.')
 
     # Handle different operations based on the 'operation' value
-    if operation == 'AddItem' or event.get('httpMethod') == 'POST':
+    if operation == 'AddItem':
         if item not in set_items:
             set_items.append(item)
             return format_response(200, f'Item {item} added successfully. Current set: {set_items}')
         else:
             return format_response(200, f'Item {item} already exists in the set. No action taken.')
 
-    elif operation == 'RemoveItem' or event.get('httpMethod') == 'DELETE':
+    elif operation == 'RemoveItem':
         if item in set_items:
             set_items.remove(item)
             return format_response(200, f'Item {item} removed successfully. Current set: {set_items}')
         else:
             return format_response(404, f'Item {item} not found in the set.')
 
-    elif operation == 'HasItem' or event.get('httpMethod') == 'GET':
+    elif operation == 'HasItem':
         exists = item in set_items
         return format_response(200, f'Item {item} exists: {exists}.')
 
     elif operation == 'Reset':
-        set_items = []
+        set_items.clear()
         return format_response(200, 'Set items have been reset.')
 
     else:
