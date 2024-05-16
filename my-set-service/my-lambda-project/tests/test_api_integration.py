@@ -22,7 +22,6 @@ def add_item(item):
 def remove_item(item):
     url = f"{BASE_URL}removeItem"
     params = {
-        "operation": "RemoveItem",
         "item": item
     }
     response = requests.delete(url, headers=headers, params=params)
@@ -31,7 +30,6 @@ def remove_item(item):
 def has_item(item):
     url = f"{BASE_URL}hasItem"
     params = {
-        "operation": "HasItem",
         "item": item
     }
     response = requests.get(url, headers=headers, params=params)

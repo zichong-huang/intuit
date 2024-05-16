@@ -97,7 +97,7 @@ Resources:
       AuthorizationType: NONE
       Integration:
         Type: AWS_PROXY
-        IntegrationHttpMethod: POST
+        IntegrationHttpMethod: DELETE
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
 
   ApiGatewayResourceHasItem:
@@ -116,7 +116,7 @@ Resources:
       AuthorizationType: NONE
       Integration:
         Type: AWS_PROXY
-        IntegrationHttpMethod: POST
+        IntegrationHttpMethod: GET
         Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations
 
   ApiGatewayResourceReset:
