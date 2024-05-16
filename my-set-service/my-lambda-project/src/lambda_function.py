@@ -6,9 +6,9 @@ set_items = []
 def lambda_handler(event, context):
     global set_items
 
-    # Extract operation and item from query parameters for GET requests
+    # Extract operation and item from query parameters for GET and DELETE requests
     if event.get('httpMethod') == 'GET' or event.get('httpMethod') == 'DELETE':
-        operation = event.get('queryStringParameters', {}).get('operation')
+        operation = event.get('queryStringParameters', {}).get('operation', event['httpMethod'])
         item = event.get('queryStringParameters', {}).get('item')
     else:
         # Handle other HTTP methods that include a body
@@ -29,21 +29,21 @@ def lambda_handler(event, context):
             return format_response(400, 'The item must be an integer.')
 
     # Handle different operations based on the 'operation' value
-    if operation == 'AddItem':
+    if operation == 'AddItem' or event.get('httpMethod') == 'POST':
         if item not in set_items:
             set_items.append(item)
             return format_response(200, f'Item {item} added successfully. Current set: {set_items}')
         else:
             return format_response(200, f'Item {item} already exists in the set. No action taken.')
 
-    elif operation == 'RemoveItem':
+    elif operation == 'RemoveItem' or event.get('httpMethod') == 'DELETE':
         if item in set_items:
             set_items.remove(item)
             return format_response(200, f'Item {item} removed successfully. Current set: {set_items}')
         else:
             return format_response(404, f'Item {item} not found in the set.')
 
-    elif operation == 'HasItem':
+    elif operation == 'HasItem' or event.get('httpMethod') == 'GET':
         exists = item in set_items
         return format_response(200, f'Item {item} exists: {exists}.')
 
