@@ -6,15 +6,15 @@ import os
 # Add the src directory to the system path to import lambda_function
 sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
 
-from lambda_function import lambda_handler
+from lambda_function import lambda_handler, set_items
 
 def make_request(method, operation, item):
     """ General helper function for simulating Lambda events. """
     headers = {'Content-Type': 'application/json'}
     event = {
         "httpMethod": method,
-        "body": json.dumps({"operation": operation, "item": item}) if method in ["POST", "DELETE"] else None,
-        "queryStringParameters": {"operation": operation, "item": str(item)} if method == "GET" else None,
+        "body": json.dumps({"operation": operation, "item": item}) if method in ["POST"] else None,
+        "queryStringParameters": {"operation": operation, "item": str(item)} if method in ["GET", "DELETE"] else None,
         "headers": headers
     }
     context = {}
@@ -22,15 +22,21 @@ def make_request(method, operation, item):
 
 class TestLocalLambda(unittest.TestCase):
 
+    def setUp(self):
+        """Reset the set_items before each test."""
+        global set_items
+        set_items.clear()
+
     def test_add_and_check_items(self):
         """Test: Add 10, 20, 30 into empty set, then check the list is still the same after sorting."""
         print("\nRunning test: Add and Check Items")
         items = [10, 20, 30]
-        for item in items:
+        for i, item in enumerate(items):
             response = make_request('POST', "AddItem", item)
             self.assertEqual(response['statusCode'], 200, f"Failed to add item {item}: {response['body']}")
             response_data = json.loads(response['body'])
-            expected_message = f'Item {item} added successfully. Current set: {items[:items.index(item) + 1]}'
+            current_set = items[:i + 1]
+            expected_message = f'Item {item} added successfully. Current set: {current_set}'
             self.assertEqual(response_data['message'], expected_message, f"Unexpected response for item {item}: {response_data}")
 
         # Check the items in the set
@@ -48,7 +54,7 @@ class TestLocalLambda(unittest.TestCase):
         for item in items:
             response = make_request('POST', "AddItem", item)
             self.assertEqual(response['statusCode'], 200, f"Failed to add item {item}: {response['body']}")
-        
+
         # Remove item 20
         response = make_request('DELETE', "RemoveItem", 20)
         self.assertEqual(response['statusCode'], 200, f"Failed to remove item 20: {response['body']}")

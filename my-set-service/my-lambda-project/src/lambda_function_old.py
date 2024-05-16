@@ -5,7 +5,7 @@ set_items = []
 
 def lambda_handler(event, context):
     # Extract operation and item from query parameters for GET requests
-    if event.get('httpMethod') == 'GET' or event.get('httpMethod') == 'DELETE':
+    if event.get('httpMethod') == 'GET':
         operation = event.get('queryStringParameters', {}).get('operation')
         item = event.get('queryStringParameters', {}).get('item')
     else:
@@ -15,7 +15,7 @@ def lambda_handler(event, context):
             body = json.loads(body)
         else:
             body = {}
-
+        
         operation = body.get('operation')
         item = body.get('item')
 

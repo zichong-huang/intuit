@@ -26,8 +26,7 @@ class TestAPI(unittest.TestCase):
             self.assertTrue(response.ok, f"Failed to add item {item}: {response.text}")
 
         # Check the items in the set
-        current_set = sorted(items)
-        for item in current_set:
+        for item in items:
             response = make_request('GET', f"{self.base_url}hasItem", "HasItem", item)
             self.assertTrue(response.ok, f"Failed to check item {item}: {response.text}")
             response_data = response.json()
@@ -35,7 +34,7 @@ class TestAPI(unittest.TestCase):
             self.assertEqual(response_data.get("message"), expected_message, f"Unexpected response for item {item}: {response_data}")
 
     def test_add_remove_and_check_items(self):
-        """Test: Add 10, 20, 30 into empty set, then remove 20, check the list contains only 10 and 30 after sorting."""
+        """Test: Add 10, 20, 30 into empty set, then remove 20, check the list contains only 10 and 30."""
         print("\nRunning test: Add, Remove, and Check Items")
         items = [10, 20, 30]
         for item in items:
@@ -75,4 +74,4 @@ class TestAPI(unittest.TestCase):
         self.assertEqual(response_data.get("message"), expected_message, f"Unexpected response for item 20: {response_data}")
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.ma
