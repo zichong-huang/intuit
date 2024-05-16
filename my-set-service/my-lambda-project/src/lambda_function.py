@@ -15,9 +15,8 @@ def lambda_handler(event, context):
     # Extract HTTP method
     http_method = event.get('httpMethod')
 
-    # Extract operation and item from query parameters for GET and DELETE requests
-    if http_method == 'GET' or http_method == 'DELETE':
-        operation = event.get('queryStringParameters', {}).get('operation')
+    # Extract item from query parameters for GET and DELETE requests
+    if http_method in ['GET', 'DELETE']:
         item = event.get('queryStringParameters', {}).get('item')
     else:
         # Handle other HTTP methods that include a body
@@ -27,7 +26,6 @@ def lambda_handler(event, context):
         else:
             body = {}
 
-        operation = body.get('operation')
         item = body.get('item')
 
     # Try to convert item to integer, handle possible ValueError
@@ -37,31 +35,34 @@ def lambda_handler(event, context):
         except (TypeError, ValueError):
             return format_response(400, 'The item must be an integer.')
 
-    # Handle different operations based on the 'operation' value or HTTP method
-    if operation == 'AddItem' or (http_method == 'POST' and operation is None):
-        if item not in set_items:
-            set_items.append(item)
-            return format_response(200, f'Item {item} added successfully. Current set: {set_items}')
+    # Handle different operations based on the HTTP method
+    if http_method == 'POST':
+        operation = body.get('operation')
+        if operation == 'AddItem':
+            if item not in set_items:
+                set_items.append(item)
+                return format_response(200, f'Item {item} added successfully. Current set: {set_items}')
+            else:
+                return format_response(200, f'Item {item} already exists in the set. No action taken.')
+        elif operation == 'Reset':
+            set_items.clear()
+            return format_response(200, 'Set items have been reset.')
         else:
-            return format_response(200, f'Item {item} already exists in the set. No action taken.')
+            return format_response(400, 'Invalid operation specified. Available operations are AddItem, RemoveItem, HasItem, and Reset.')
 
-    elif operation == 'RemoveItem' or (http_method == 'DELETE' and operation is None):
+    elif http_method == 'DELETE':
         if item in set_items:
             set_items.remove(item)
             return format_response(200, f'Item {item} removed successfully. Current set: {set_items}')
         else:
             return format_response(404, f'Item {item} not found in the set.')
 
-    elif operation == 'HasItem' or (http_method == 'GET' and operation is None):
+    elif http_method == 'GET':
         exists = item in set_items
         return format_response(200, f'Item {item} exists: {exists}.')
 
-    elif operation == 'Reset' or (http_method == 'POST' and operation == 'Reset'):
-        set_items.clear()
-        return format_response(200, 'Set items have been reset.')
-
     else:
-        return format_response(400, 'Invalid operation specified. Available operations are AddItem, RemoveItem, HasItem, and Reset.')
+        return format_response(400, 'Unsupported HTTP method.')
 
 def format_response(status_code, message):
     """

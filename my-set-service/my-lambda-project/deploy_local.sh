@@ -18,4 +18,4 @@ docker tag my-lambda-function:latest $ECR_REPOSITORY:$IMAGE_TAG
 docker push $ECR_REPOSITORY:$IMAGE_TAG
 
 # # Update the Lambda function with the new image
-# aws lambda update-function-code --function-name mylambdastack-LambdaFunction-V79cQI3FIzzY --image-uri $ECR_REPOSITORY:$IMAGE_TAG --region $REGION
+aws lambda update-function-code --function-name intuit-set-application-LambdaFunction-9gSVnNrzmsFd --image-uri $ECR_REPOSITORY:$IMAGE_TAG --region $REGION
