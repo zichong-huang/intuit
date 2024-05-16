@@ -19,8 +19,9 @@ def lambda_handler(event, context):
 
     # Extract item from query parameters for GET and DELETE requests
     if http_method in ['GET', 'DELETE']:
-        if 'queryStringParameters' in event:
+        if 'queryStringParameters' in event and event['queryStringParameters']:
             item = event.get('queryStringParameters', {}).get('item')
+            print("fffffff",item, "fffff")
         else:
             logger.error("Query string parameters missing in GET/DELETE request")
             return format_response(400, 'Query string parameters are required for GET and DELETE requests.')

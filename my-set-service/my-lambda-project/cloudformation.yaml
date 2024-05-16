@@ -32,7 +32,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
-                Resource: arn:aws:lambda:*:*:function:*
+                Resource: arn:aws:lambda:*:*:function:intuit-set-application-LambdaFunction-9gSVnNrzmsFd
               - Effect: Allow
                 Action:
                   - ecr:GetAuthorizationToken
