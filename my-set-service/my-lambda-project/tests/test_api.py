@@ -15,7 +15,7 @@ def make_request(method, url, operation, item):
     return response
 
 class TestAPI(unittest.TestCase):
-    base_url = "https://a541wh2ca6.execute-api.us-east-1.amazonaws.com/prod/"
+    base_url = "https://lyz9wufcbk.execute-api.us-east-1.amazonaws.com/prod/"
 
     def test_add_and_check_items(self):
         """Test: Add 10, 20, 30 into empty set, then check the list is still the same after sorting."""
