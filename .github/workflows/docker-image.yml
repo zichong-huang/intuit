@@ -94,7 +94,7 @@ jobs:
         AWS_REGION: ${{ secrets.AWS_REGION }}
         ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
       run: |
-        aws lambda update-function-code --function-name intuit-set-LambdaFunction-9gSVnNrzmsFd --image-uri $ECR_REPOSITORY:${{ env.IMAGE_TAG }} --region $AWS_REGION
+        aws lambda update-function-code --function-name intuit-set-application-LambdaFunction-9gSVnNrzmsFd --image-uri $ECR_REPOSITORY:${{ env.IMAGE_TAG }} --region $AWS_REGION
 
   integration-tests:
     runs-on: ubuntu-latest
