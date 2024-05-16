@@ -54,12 +54,11 @@ This AWS CloudFormation template deploys a Lambda function from a Docker image s
 1. **Clone the Repository**:
     ```sh
     git clone <repository_url>
-    cd <repository_directory>
     ```
 
 2. **Deploy the CloudFormation Stack**:
     ```sh
-    aws cloudformation create-stack --stack-name my-lambda-stack --template-body file://path/to/cloudformation.yaml --capabilities CAPABILITY_NAMED_IAM
+    aws cloudformation create-stack --stack-name my-lambda-stack --template-body file://cloudformation.yaml --capabilities CAPABILITY_NAMED_IAM
     ```
 
 3. **Wait for the stack to be created**:
