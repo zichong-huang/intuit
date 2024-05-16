@@ -1,10 +1,16 @@
 import json
+import logging
 
 # Initialize the 'set_items' as a global variable
 set_items = []
 
+# Configure logging
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+
 def lambda_handler(event, context):
     global set_items
+    logger.info(f"Event: {json.dumps(event)}")
 
     # Extract HTTP method
     http_method = event.get('httpMethod')
