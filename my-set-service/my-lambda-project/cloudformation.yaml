@@ -31,6 +31,10 @@ Resources:
                 Resource: arn:aws:logs:*:*:*
               - Effect: Allow
                 Action:
+                  - lambda:InvokeFunction
+                Resource: arn:aws:lambda:*:*:function:*
+              - Effect: Allow
+                Action:
                   - ecr:GetAuthorizationToken
                   - ecr:BatchCheckLayerAvailability
                   - ecr:GetDownloadUrlForLayer

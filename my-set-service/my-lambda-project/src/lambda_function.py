@@ -14,10 +14,16 @@ def lambda_handler(event, context):
 
     # Extract HTTP method
     http_method = event.get('httpMethod')
+    item = None
+    operation = None
 
     # Extract item from query parameters for GET and DELETE requests
     if http_method in ['GET', 'DELETE']:
-        item = event.get('queryStringParameters', {}).get('item')
+        if 'queryStringParameters' in event:
+            item = event.get('queryStringParameters', {}).get('item')
+        else:
+            logger.error("Query string parameters missing in GET/DELETE request")
+            return format_response(400, 'Query string parameters are required for GET and DELETE requests.')
     else:
         # Handle other HTTP methods that include a body
         body = event.get("body", "{}")
@@ -27,17 +33,21 @@ def lambda_handler(event, context):
             body = {}
 
         item = body.get('item')
+        operation = body.get('operation')
+
+    # Log extracted parameters
+    logger.info(f"HTTP Method: {http_method}, Item: {item}, Operation: {operation if http_method == 'POST' else 'N/A'}")
 
     # Try to convert item to integer, handle possible ValueError
     if item is not None:
         try:
             item = int(item)
         except (TypeError, ValueError):
+            logger.error("The item must be an integer.")
             return format_response(400, 'The item must be an integer.')
 
     # Handle different operations based on the HTTP method
     if http_method == 'POST':
-        operation = body.get('operation')
         if operation == 'AddItem':
             if item not in set_items:
                 set_items.append(item)
@@ -48,6 +58,7 @@ def lambda_handler(event, context):
             set_items.clear()
             return format_response(200, 'Set items have been reset.')
         else:
+            logger.error("Invalid operation specified in POST request.")
             return format_response(400, 'Invalid operation specified. Available operations are AddItem, RemoveItem, HasItem, and Reset.')
 
     elif http_method == 'DELETE':
@@ -62,6 +73,7 @@ def lambda_handler(event, context):
         return format_response(200, f'Item {item} exists: {exists}.')
 
     else:
+        logger.error("Unsupported HTTP method.")
         return format_response(400, 'Unsupported HTTP method.')
 
 def format_response(status_code, message):
